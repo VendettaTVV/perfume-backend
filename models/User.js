@@ -14,11 +14,20 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // 👇 Добавляем поле админа (по умолчанию - ложь)
   isAdmin: {
     type: Boolean,
-    default: false, 
+    default: false,
   },
+  // ❗️ НОВОЕ ПОЛЕ: Список избранного
+  wishlist: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product' // Ссылка на коллекцию продуктов
+  }],
+  
+  // Поля для сброса пароля (если мы их добавляли ранее)
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
+  
   createdAt: {
     type: Date,
     default: Date.now,
