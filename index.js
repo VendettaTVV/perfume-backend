@@ -1,4 +1,3 @@
-// index.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,7 +8,7 @@ const productRoutes = require('./routes/products');
 const checkoutRoutes = require('./routes/checkout');
 const orderRoutes = require('./routes/orders');
 const couponRoutes = require('./routes/coupons');
-const userRoutes = require('./routes/user'); // 👈 1. НОВЫЙ ИМПОРТ
+const userRoutes = require('./routes/user');
 const { getSalesAnalytics } = require('./controllers/adminController');
 const path = require('path');
 
@@ -20,8 +19,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('✅ Подключение к MongoDB Atlas установлено'))
-.catch((err) => console.error('❌ Ошибка подключения к MongoDB:', err));
+.then(() => console.log('✅ MongoDB Atlas connection established'))
+.catch((err) => console.error('❌ MongoDB connection error:', err));
 
 app.post('/api/checkout/webhook', 
   express.raw({type: 'application/json'}), 
@@ -37,10 +36,10 @@ app.use('/api/products', productRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/coupons', couponRoutes);
-app.use('/api/user', userRoutes); // 👈 2. ПОДКЛЮЧЕНИЕ РОУТА
+app.use('/api/user', userRoutes);
 
 app.get('/api/orders/analytics', getSalesAnalytics); 
 
 app.listen(PORT, () => {
-  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

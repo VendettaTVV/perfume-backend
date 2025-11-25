@@ -17,33 +17,33 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  getSalesAnalytics, // <-- ДОБАВЛЕНО
+  getSalesAnalytics, 
 } = require('../controllers/adminController');
 
 const router = express.Router();
 
-// Middleware для всех роутов в этом файле
+// Apply middleware to all routes in this file
 router.use(checkAuth);
 router.use(adminAuth);
 
-// Аналитика
-router.get('/analytics', getSalesAnalytics); // <-- НОВЫЙ РОУТ
+// Analytics
+router.get('/analytics', getSalesAnalytics); 
 
-// Управление пользователями
+// User Management
 router.get('/users', getAllUsers);
 router.delete('/users/:id', deleteUser);
 
-// Управление заказами
+// Order Management
 router.get('/orders', getOrders);
 router.get('/orders/:id', getSingleOrder);
 router.put('/orders/:id/pay', updateOrderToPaid);
 router.put('/orders/:id/deliver', updateOrderToDelivered);
 router.delete('/orders/:id', deleteOrder);
 
-// Управление продуктами
+// Product Management
 router.get('/products', getAllProducts);
 router.get('/products/:id', getSingleProduct);
-// Используем middleware для загрузки изображений
+// Use middleware for image uploads
 router.post('/products', uploadMiddleware.single('image'), createProduct);
 router.put('/products/:id', uploadMiddleware.single('image'), updateProduct);
 router.delete('/products/:id', deleteProduct);

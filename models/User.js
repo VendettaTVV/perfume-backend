@@ -18,16 +18,16 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  // ❗️ НОВОЕ ПОЛЕ: Список избранного
   wishlist: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product' // Ссылка на коллекцию продуктов
+    ref: 'Product'
   }],
-  
-  // Поля для сброса пароля (если мы их добавляли ранее)
-  resetPasswordToken: { type: String },
-  resetPasswordExpires: { type: Date },
-  
+  resetPasswordToken: {
+    type: String
+  },
+  resetPasswordExpires: {
+    type: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now,

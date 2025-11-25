@@ -1,14 +1,10 @@
 const mongoose = require('mongoose');
 
-// Обновленная схема адреса (UK)
 const ShippingInfoSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  
-  // ❗️ ЗАМЕНИЛИ 'address' НА НОВЫЕ ПОЛЯ
   addressLine1: { type: String, required: true },
-  addressLine2: { type: String, default: '' }, // Не обязательно
-  
+  addressLine2: { type: String, default: '' },
   city: { type: String, required: true },
   postcode: { type: String, required: true },
   country: { type: String, required: true, default: 'United Kingdom' },
@@ -50,8 +46,8 @@ const OrderSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Оплачено', 'В работе', 'Отправлено', 'Доставлено', 'Отменено'],
-    default: 'Оплачено',
+    enum: ['Paid', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+    default: 'Paid',
   },
   createdAt: {
     type: Date,

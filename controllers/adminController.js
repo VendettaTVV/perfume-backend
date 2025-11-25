@@ -4,7 +4,6 @@ const Product = require('../models/Product');
 const asyncHandler = require('express-async-handler');
 const { deleteFile } = require('../utils/fileStorage');
 
-// --- ЗАГЛУШКИ ДЛЯ ФУНКЦИЙ (Чтобы сервер не падал) ---
 const getAllUsers = (req, res) => res.status(501).json({ message: 'Not Implemented' });
 const deleteUser = (req, res) => res.status(501).json({ message: 'Not Implemented' });
 const getOrders = (req, res) => res.status(501).json({ message: 'Not Implemented' });
@@ -17,10 +16,6 @@ const getSingleProduct = (req, res) => res.status(501).json({ message: 'Not Impl
 const createProduct = (req, res) => res.status(501).json({ message: 'Not Implemented' });
 const updateProduct = (req, res) => res.status(501).json({ message: 'Not Implemented' });
 const deleteProduct = (req, res) => res.status(501).json({ message: 'Not Implemented' });
-
-// ====================================================================
-// ЛОГИКА АНАЛИТИКИ
-// ====================================================================
 
 const getDateAYearAgo = () => {
   const d = new Date();
@@ -37,13 +32,11 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
   const oneYearAgo = getDateAYearAgo();
   const startOfMonth = getStartOfCurrentMonth();
 
-  // 1. Общая сводка (за все время)
   const overallSummary = await Order.aggregate([
-    { $match: { status: 'Оплачено' } },
+    { $match: { status: 'Paid' } },
     {
       $group: {
         _id: null,
-        // Вычитаем доставку. Если shippingPrice нет (старые заказы), считаем 0.
         totalRevenue: { 
           $sum: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } 
         },
@@ -56,16 +49,14 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
     { $project: { _id: 0, totalRevenue: 1, totalOrders: 1, avgOrderValue: 1 } },
   ]);
 
-  // 2. Помесячные данные (за последний год)
   const monthlyData = await Order.aggregate([
-    { $match: { status: 'Оплачено', createdAt: { $gte: oneYearAgo } } },
+    { $match: { status: 'Paid', createdAt: { $gte: oneYearAgo } } },
     {
       $group: {
         _id: {
           year: { $year: '$createdAt' },
           month: { $month: '$createdAt' },
         },
-        // Вычитаем доставку
         totalRevenue: { 
           $sum: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } 
         },
@@ -95,9 +86,8 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
     },
   ]);
 
-  // 3. Топ товаров за ВСЕ ВРЕМЯ
   const topProductsAllTime = await Order.aggregate([
-    { $match: { status: 'Оплачено' } },
+    { $match: { status: 'Paid' } },
     { $unwind: '$orderItems' }, 
     {
       $group: {
@@ -110,9 +100,8 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
     { $limit: 10 }
   ]);
 
-  // 4. Топ товаров за ТЕКУЩИЙ МЕСЯЦ
   const topProductsThisMonth = await Order.aggregate([
-    { $match: { status: 'Оплачено', createdAt: { $gte: startOfMonth } } },
+    { $match: { status: 'Paid', createdAt: { $gte: startOfMonth } } },
     { $unwind: '$orderItems' },
     {
       $group: {

@@ -1,20 +1,18 @@
 const mongoose = require('mongoose');
 
-// Схема отдельного отзыва
 const reviewSchema = mongoose.Schema({
   name: { type: String, required: true },
-  rating: { type: Number, required: true }, // Оценка 1-5
+  rating: { type: Number, required: true },
   comment: { type: String, required: true },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User', // Ссылка на пользователя
+    ref: 'User',
   },
 }, {
   timestamps: true,
 });
 
-// Схема Варианта (5ml, 10ml...)
 const VariantSchema = new mongoose.Schema({
   size: { type: Number, required: true },
   price: { type: Number, required: true },
@@ -31,6 +29,18 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  category: {
+    type: String,
+    required: true,
+    enum: ['Fresh', 'Woody', 'Floral', 'Oriental', 'Fruity', 'Spicy'],
+    default: 'Fresh'
+  },
+  gender: {
+    type: String,
+    required: true,
+    enum: ['Male', 'Female', 'Unisex'],
+    default: 'Unisex'
+  },
   bgColor: {
     type: String,
     default: '#D4CFCB',
@@ -41,13 +51,15 @@ const ProductSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
-  variants: [VariantSchema], 
+  variants: [VariantSchema],
   isHidden: {
     type: Boolean,
     default: false,
   },
-  
-  // НОВЫЕ ПОЛЯ ДЛЯ ОТЗЫВОВ
+  similarProducts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product'
+  }],
   reviews: [reviewSchema],
   rating: {
     type: Number,
@@ -59,7 +71,6 @@ const ProductSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-
   createdAt: {
     type: Date,
     default: Date.now,

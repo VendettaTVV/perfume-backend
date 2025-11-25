@@ -5,7 +5,7 @@ const CouponSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    uppercase: true, // Храним всегда в верхнем регистре (SUMMER10)
+    uppercase: true,
     trim: true,
   },
   discountPercent: {

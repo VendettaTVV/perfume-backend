@@ -3,58 +3,53 @@ const router = express.Router();
 const Coupon = require('../models/Coupon');
 const verifyToken = require('../middleware/verifyToken');
 
-// 1. СОЗДАТЬ КУПОН (Только Админ)
-// Пример тела запроса: { "code": "SUMMER10", "discountPercent": 10, "expiryDate": "2025-12-31" }
 router.post('/', verifyToken, async (req, res) => {
-  if (!req.user.isAdmin) return res.status(403).json({ message: 'Доступ запрещен' });
-  
+  if (!req.user.isAdmin) return res.status(403).json({ message: 'Access denied' });
+
   try {
     const { code, discountPercent, expiryDate } = req.body;
-    
+
     const newCoupon = new Coupon({
       code,
       discountPercent,
       expiryDate,
     });
-    
+
     await newCoupon.save();
     res.status(201).json(newCoupon);
   } catch (err) {
-    console.error(err); // Логируем ошибку в консоль
-    res.status(500).json({ message: 'Ошибка создания купона' });
+    console.error(err);
+    res.status(500).json({ message: 'Error creating coupon' });
   }
 });
 
-// 2. ПРОВЕРИТЬ КУПОН (Публичный роут)
 router.post('/validate', async (req, res) => {
   try {
     const { code } = req.body;
-    
-    // Ищем купон (игнорируя регистр, если сохраняли uppercase)
+
     const coupon = await Coupon.findOne({ code: code.toUpperCase() });
-    
+
     if (!coupon) {
-      return res.status(404).json({ message: 'Купон не найден' });
+      return res.status(404).json({ message: 'Coupon not found' });
     }
-    
+
     if (!coupon.isActive) {
-      return res.status(400).json({ message: 'Купон неактивен' });
+      return res.status(400).json({ message: 'Coupon is inactive' });
     }
-    
+
     if (new Date() > new Date(coupon.expiryDate)) {
-      return res.status(400).json({ message: 'Срок действия купона истек' });
+      return res.status(400).json({ message: 'Coupon has expired' });
     }
-    
-    // Если все ок, возвращаем данные
-    res.status(200).json({ 
-      isValid: true, 
+
+    res.status(200).json({
+      isValid: true,
       discountPercent: coupon.discountPercent,
-      code: coupon.code 
+      code: coupon.code
     });
-    
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Ошибка проверки' });
+    res.status(500).json({ message: 'Validation error' });
   }
 });
 
