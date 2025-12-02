@@ -37,13 +37,9 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: null,
-        totalRevenue: { 
-          $sum: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } 
-        },
+        totalRevenue: { $sum: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } },
         totalOrders: { $sum: 1 },
-        avgOrderValue: { 
-          $avg: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } 
-        },
+        avgOrderValue: { $avg: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } },
       },
     },
     { $project: { _id: 0, totalRevenue: 1, totalOrders: 1, avgOrderValue: 1 } },
@@ -57,9 +53,7 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
           year: { $year: '$createdAt' },
           month: { $month: '$createdAt' },
         },
-        totalRevenue: { 
-          $sum: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } 
-        },
+        totalRevenue: { $sum: { $subtract: ['$totalPrice', { $ifNull: ['$shippingPrice', 0] }] } },
         totalOrders: { $sum: 1 },
       },
     },
@@ -88,7 +82,7 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
 
   const topProductsAllTime = await Order.aggregate([
     { $match: { status: 'Paid' } },
-    { $unwind: '$orderItems' }, 
+    { $unwind: '$orderItems' },
     {
       $group: {
         _id: { name: '$orderItems.name', size: '$orderItems.size' },
@@ -115,11 +109,7 @@ const getSalesAnalytics = asyncHandler(async (req, res) => {
   ]);
 
   res.status(200).json({
-    summary: overallSummary[0] || {
-      totalRevenue: 0,
-      totalOrders: 0,
-      avgOrderValue: 0,
-    },
+    summary: overallSummary[0] || { totalRevenue: 0, totalOrders: 0, avgOrderValue: 0 },
     monthlySales: monthlyData,
     topProductsAllTime,
     topProductsThisMonth,

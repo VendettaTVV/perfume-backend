@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const Order = require('../models/Order');
-const verifyToken = require('../middleware/verifyToken');
+const verifyToken = require('../middleware/verifyToken'); // assuming you want to use the imported middleware
 const multer = require('multer');
 const path = require('path');
 
@@ -50,14 +50,14 @@ router.get('/all', verifyToken, async (req, res) => {
     const products = await Product.find({});
     res.status(200).json(products || []);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error loading warehouse' });
   }
 });
 
 router.get('/:id', async (req, res) => {
   try {
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-       return res.status(404).json({ message: 'Invalid ID' });
+       return res.status(404).json({ message: 'Invalid product ID' });
     }
     const product = await Product.findById(req.params.id).populate('similarProducts');
     if (!product) return res.status(404).json({ message: 'Product not found' });

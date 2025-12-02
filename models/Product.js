@@ -51,15 +51,17 @@ const ProductSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
-  variants: [VariantSchema],
+  variants: [VariantSchema], 
   isHidden: {
     type: Boolean,
     default: false,
   },
+  
   similarProducts: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
+    ref: 'Product' 
   }],
+  
   reviews: [reviewSchema],
   rating: {
     type: Number,
@@ -71,10 +73,13 @@ const ProductSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-module.exports = mongoose.model('Product', ProductSchema);
+const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
+
+module.exports = Product;

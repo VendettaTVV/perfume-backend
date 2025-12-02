@@ -43,11 +43,16 @@ router.patch('/:id/status', async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
+    const validStatuses = ['Paid', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+    }
+
     order.status = status;
     await order.save();
 
     if (sendOrderStatusEmail) {
-        sendOrderStatusEmail(order).catch(err => console.error('Email error:', err));
+      sendOrderStatusEmail(order).catch(err => console.error('Email error:', err));
     }
 
     res.status(200).json(order);
